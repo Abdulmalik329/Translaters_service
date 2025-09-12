@@ -1,17 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const {
-  getAllTextTranslations,
-  createTextTranslation,
-  getTextTranslationById,
-  updateTextTranslation,
-  deleteTextTranslation,
-} = require("../controllers/text_contract.controller");
+const textContractController = require("../controllers/text_contract.controller");
+const validate = require("../middlewares/validate");
+const { textContractSchema } = require("../middlewares/validations");
 
-router.get("/", getAllTextTranslations);
-router.post("/", createTextTranslation);
-router.get("/:id", getTextTranslationById);
-router.put("/:id", updateTextTranslation);
-router.delete("/:id", deleteTextTranslation);
+router.post("/", validate(textContractSchema), textContractController.createContract);
+router.get("/", textContractController.getAllContracts);
+router.get("/:id", textContractController.getContractById);
+router.put("/:id", validate(textContractSchema), textContractController.updateContract);
+router.delete("/:id", textContractController.deleteContract);
 
 module.exports = router;

@@ -1,17 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const {
-  getAllTranslaters,
-  createTranslater,
-  getTranslaterById,
-  updateTranslater,
-  deleteTranslater,
-} = require("../controllers/translater.controller");
+const translaterController = require("../controllers/translater.controller");
+const validate = require("../middlewares/validate");
+const { translaterSchema } = require("../middlewares/validations");
 
-router.get("/", getAllTranslaters);
-router.post("/", createTranslater);
-router.get("/:id", getTranslaterById);
-router.put("/:id", updateTranslater);
-router.delete("/:id", deleteTranslater);
+router.post("/", validate(translaterSchema), translaterController.createTranslater);
+router.get("/", translaterController.getAllTranslaters);
+router.get("/:id", translaterController.getTranslaterById);
+router.put("/:id", validate(translaterSchema), translaterController.updateTranslater);
+router.delete("/:id", translaterController.deleteTranslater);
 
 module.exports = router;

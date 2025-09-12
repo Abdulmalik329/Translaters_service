@@ -1,59 +1,70 @@
-const TextTranslation = require("../models/text_contract");
+const TextContract = require("../models/text_contract");
 
-const getAllTextTranslations = async (req, res) => {
+// Hammasini olish
+const getAllContracts = async (req, res) => {
   try {
-    const translations = await TextTranslation.findAll();
-    res.json(translations);
+    const contracts = await TextContract.findAll();
+    res.json(contracts);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-const createTextTranslation = async (req, res) => {
+// Yangi contract yaratish
+const createContract = async (req, res) => {
   try {
-    const translation = await TextTranslation.create(req.body);
-    res.status(201).json(translation);
+    const contract = await TextContract.create(req.body);
+    res.status(201).json(contract);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
-const getTextTranslationById = async (req, res) => {
+// ID bo‘yicha contract olish
+const getContractById = async (req, res) => {
   try {
-    const translation = await TextTranslation.findByPk(req.params.id);
-    if (!translation) return res.status(404).json({ error: "Text translation not found" });
-    res.json(translation);
+    const contract = await TextContract.findByPk(req.params.id);
+    if (!contract) {
+      return res.status(404).json({ error: "Contract not found" });
+    }
+    res.json(contract);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-const updateTextTranslation = async (req, res) => {
+// ID bo‘yicha contractni yangilash
+const updateContract = async (req, res) => {
   try {
-    const translation = await TextTranslation.findByPk(req.params.id);
-    if (!translation) return res.status(404).json({ error: "Text translation not found" });
-    await translation.update(req.body);
-    res.json(translation);
+    const contract = await TextContract.findByPk(req.params.id);
+    if (!contract) {
+      return res.status(404).json({ error: "Contract not found" });
+    }
+    await contract.update(req.body);
+    res.json(contract);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
-const deleteTextTranslation = async (req, res) => {
+// ID bo‘yicha contractni o‘chirish
+const deleteContract = async (req, res) => {
   try {
-    const translation = await TextTranslation.findByPk(req.params.id);
-    if (!translation) return res.status(404).json({ error: "Text translation not found" });
-    await translation.destroy();
-    res.json({ message: "Text translation deleted" });
+    const contract = await TextContract.findByPk(req.params.id);
+    if (!contract) {
+      return res.status(404).json({ error: "Contract not found" });
+    }
+    await contract.destroy();
+    res.json({ message: "Contract deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
 module.exports = {
-  getAllTextTranslations,
-  createTextTranslation,
-  getTextTranslationById,
-  updateTextTranslation,
-  deleteTextTranslation,
+  getAllContracts,
+  createContract,
+  getContractById,
+  updateContract,
+  deleteContract,
 };

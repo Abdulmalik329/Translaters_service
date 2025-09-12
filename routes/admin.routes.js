@@ -1,19 +1,14 @@
 const express = require("express");
 const router = express.Router();
-const {
-  getAllAdmins,
-  createAdmin,
-  getAdminById,
-  updateAdmin,
-  deleteAdmin,
-} = require("../controllers/admin.controller");
+const adminController = require("../controllers/admin.controller");
+const validate = require("../middlewares/validate");
+const { adminSchema } = require("../middlewares/validations");
 
-// Routes
-router.get("/", getAllAdmins);
-router.post("/", createAdmin);
-router.get("/:id", getAdminById);
-router.put("/:id", updateAdmin);
-router.delete("/:id", deleteAdmin);
+router.post("/", validate(adminSchema), adminController.createAdmin);
+router.get("/", adminController.getAllAdmins);
+router.get("/:id", adminController.getAdminById);
+router.put("/:id", validate(adminSchema), adminController.updateAdmin);
+router.delete("/:id", adminController.deleteAdmin);
 
-// ✅ EXPORT
+
 module.exports = router;

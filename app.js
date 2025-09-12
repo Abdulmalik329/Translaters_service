@@ -1,24 +1,33 @@
 const express = require("express");
-const config = require("config")
-const mainRouter = require("./routes/index")
+const config = require("config");
+const mainRouter = require("./routes/index");
+const sequelize = require("./config/db");
+const cookieParser = require("cookie-parser");
+const authRoutes = require("./routes/auth.routes");
 
-const PORT = config.get("port") ?? 3030 
+const PORT = config.get("port") ?? 3030;
 
 const app = express();
-app.use(express.json)
 
+app.use(express.json());
+app.use(cookieParser());
 
 app.use("/api", mainRouter);
-
+app.use("/api/auth", authRoutes);
 
 const start = async () => {
-  
-try { 
+  try {
+    await sequelize.authenticate();
+    console.log("Database connected successfully.");
+
+    await sequelize.sync({ alter: true });
+    console.log("All models synchronized.");
+
     app.listen(PORT, () => {
       console.log(`Server started at: http://localhost:${PORT}`);
     });
   } catch (error) {
-    console.log(error);
+    console.error("Unable to connect to the database or sync models:", error);
   }
 };
 

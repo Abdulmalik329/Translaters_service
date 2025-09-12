@@ -1,17 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const {
-  getAllLanguages,
-  createLanguage,
-  getLanguageById,
-  updateLanguage,
-  deleteLanguage,
-} = require("../controllers/languages.controller");
+const languageController = require("../controllers/language.controller");
+const validate = require("../middlewares/validate");
+const { languageSchema } = require("../middlewares/validations");
 
-router.get("/", getAllLanguages);
-router.post("/", createLanguage);
-router.get("/:id", getLanguageById);
-router.put("/:id", updateLanguage);
-router.delete("/:id", deleteLanguage);
+router.post("/", validate(languageSchema), languageController.createLanguage);
+router.get("/", languageController.getAllLanguages);
+router.get("/:id", languageController.getLanguageById);
+router.put("/:id", validate(languageSchema), languageController.updateLanguage);
+router.delete("/:id", languageController.deleteLanguage);
 
 module.exports = router;
