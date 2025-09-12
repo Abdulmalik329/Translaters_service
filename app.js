@@ -1,10 +1,14 @@
 const express = require("express");
 const config = require("config")
+const mainRouter = require("./routes/index")
 
 const PORT = config.get("port") ?? 3030 
 
 const app = express();
-app(express.json)
+app.use(express.json)
+
+
+app.use("/api", mainRouter);
 
 
 const start = async () => {
