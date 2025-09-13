@@ -17,7 +17,7 @@ app.use("/api/auth", authRoutes);
 
 const start = async () => {
   try {
-    await sequelize.authenticate();
+    await sequelize.authenticate(); 
     console.log("Database connected successfully.");
 
     await sequelize.sync({ alter: true });

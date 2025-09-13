@@ -2,13 +2,15 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const config = require("config");
 const Admin = require("../models/admin");
+const { Op } = require("sequelize");
+const sendVerificationEmail = require("../helper/sendEmail");  // Email yuborish funksiyasi
 
 const jwtSecret = config.get("jwtSecret");
 const jwtRefreshSecret = config.get("jwtRefreshSecret");
 const accessTokenExpiry = config.get("jwtAccessExpiration");
 const refreshTokenExpiry = config.get("jwtRefreshExpiration");
 
-// Token yaratish
+// Access token yaratish
 const generateAccessToken = (admin) => {
   return jwt.sign(
     { id: admin.id, email: admin.email, name: admin.name },
@@ -17,6 +19,7 @@ const generateAccessToken = (admin) => {
   );
 };
 
+// Refresh token yaratish
 const generateRefreshToken = (admin) => {
   return jwt.sign(
     { id: admin.id },
@@ -25,12 +28,12 @@ const generateRefreshToken = (admin) => {
   );
 };
 
-// Register (Sign Up)
+// Ro'yxatdan o'tish
 const register = async (req, res) => {
   try {
     const { name, phone, email, password } = req.body;
 
-    // Email yoki phone allaqachon mavjudligini tekshirish
+    // Email yoki telefon allaqachon borligini tekshirish
     const candidate = await Admin.findOne({
       where: {
         [Op.or]: [{ email }, { phone }]
@@ -40,45 +43,57 @@ const register = async (req, res) => {
       return res.status(400).json({ message: "Email yoki telefon allaqachon ro'yxatdan o'tgan" });
     }
 
+    // Parolni hash qilish
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Admin yaratish, dastlab is_verified = false
     const admin = await Admin.create({
       name,
       phone,
       email,
       password: hashedPassword,
+      is_verified: false,
       is_creater: false,
     });
-    console.log("1");
-    
 
-    res.status(201).json({ message: "Admin muvaffaqiyatli ro'yxatdan o'tdi" });
+    // Email tasdiqlash uchun token yaratish (faqat id)
+    const token = jwt.sign({ id: admin.id }, jwtSecret, { expiresIn: "1d" }); // 1 kun amal qiladi
+
+    // Tasdiqlash emailini yuborish
+    await sendVerificationEmail(email, token);
+
+    res.status(201).json({ message: "Admin muvaffaqiyatli ro'yxatdan o'tdi. Iltimos, emailingizni tasdiqlang." });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-    console.log("1");
 
-// Login (Sign In)
+// Login
 const login = async (req, res) => {
   try {
-    if (!admin.is_verified) {
-    return res.status(401).json({ message: "Email hali tasdiqlanmagan!" });
-    }
     const { email, password } = req.body;
+
+    // Adminni topish
     const admin = await Admin.findOne({ where: { email } });
     if (!admin) return res.status(400).json({ message: "Noto'g'ri email yoki parol" });
 
+    // Email tasdiqlanganligini tekshirish
+    if (!admin.is_verified) {
+      return res.status(401).json({ message: "Email hali tasdiqlanmagan!" });
+    }
+
+    // Parolni solishtirish
     const isValid = await bcrypt.compare(password, admin.password);
     if (!isValid) return res.status(400).json({ message: "Noto'g'ri email yoki parol" });
 
+    // Tokenlar yaratish
     const accessToken = generateAccessToken(admin);
     const refreshToken = generateRefreshToken(admin);
 
-    // Refresh tokenni cookie ga yozamiz
+    // Refresh tokenni cookie ga joylash
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // productionda true qilinadi
+      secure: process.env.NODE_ENV === "production",
       maxAge: refreshTokenExpiry * 1000,
       sameSite: "strict",
     });
@@ -89,13 +104,13 @@ const login = async (req, res) => {
   }
 };
 
-// Logout (Sign Out)
+// Logout
 const logout = (req, res) => {
   res.clearCookie("refreshToken");
   res.json({ message: "Logout muvaffaqiyatli bajarildi" });
 };
 
-// Refresh Token
+// Refresh tokenni yangilash
 const refreshToken = (req, res) => {
   try {
     const token = req.cookies.refreshToken;
@@ -116,6 +131,7 @@ const refreshToken = (req, res) => {
   }
 };
 
+// Email tasdiqlash
 const verifyEmail = async (req, res) => {
   try {
     const { token } = req.query;
@@ -135,7 +151,6 @@ const verifyEmail = async (req, res) => {
     res.status(400).json({ message: "Token noto'g'ri yoki muddati tugagan" });
   }
 };
-
 
 module.exports = {
   register,

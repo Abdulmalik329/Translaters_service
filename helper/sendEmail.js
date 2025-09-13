@@ -13,7 +13,7 @@ async function sendVerificationEmail(to, token) {
   const link = `${config.get("api_url")}/api/auth/verify-email?token=${token}`;
 
   await transporter.sendMail({
-    from: `"Admin Panel" <${config.get("email_user")}>`,
+    from: `Admin Panel <${config.get("email_user")}>`,
     to,
     subject: "Emailni tasdiqlang",
     html: `
