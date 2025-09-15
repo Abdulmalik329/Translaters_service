@@ -26,12 +26,10 @@ const generateRefreshToken = (admin) => {
   );
 };
 
-// Ro'yxatdan o'tish
 const register = async (req, res) => {
   try {
     const { name, phone, email, password } = req.body;
 
-    // Email yoki telefon allaqachon borligini tekshirish
     const candidate = await Admin.findOne({
       where: {
         [Op.or]: [{ email }, { phone }]
@@ -41,10 +39,8 @@ const register = async (req, res) => {
       return res.status(400).json({ message: "Email yoki telefon allaqachon ro'yxatdan o'tgan" });
     }
 
-    // Parolni hash qilish
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Admin yaratish, dastlab is_verified = false
     const admin = await Admin.create({
       name,
       phone,
@@ -54,10 +50,8 @@ const register = async (req, res) => {
       is_creater: false,
     });
 
-    // Email tasdiqlash uchun token yaratish (faqat id)
-    const token = jwt.sign({ id: admin.id }, jwtSecret, { expiresIn: "1d" }); // 1 kun amal qiladi
+    const token = jwt.sign({ id: admin.id }, jwtSecret, { expiresIn: "1d" }); 
 
-    // Tasdiqlash emailini yuborish
     await sendVerificationEmail(email, token);
 
     res.status(201).json({ message: "Admin muvaffaqiyatli ro'yxatdan o'tdi. Iltimos, emailingizni tasdiqlang." });

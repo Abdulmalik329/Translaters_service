@@ -7,7 +7,6 @@ const {
   Payment,
 } = require("../models");
 
-// 1. Berilgan vaqt oralig‘ida foydalanilgan xizmatlar ro‘yxatini chiqarish
 async function getServicesByPeriod(req, res) {
   try {
     const { startDate, endDate } = req.query;
@@ -25,7 +24,6 @@ async function getServicesByPeriod(req, res) {
   }
 }
 
-// 2. Berilgan vaqt oralig‘ida xizmatdan foydalangan Clientlar ro‘yxatini chiqarish
 async function getClientsByServicePeriod(req, res) {
   try {
     const { startDate, endDate } = req.query;
@@ -48,9 +46,7 @@ async function getClientsByServicePeriod(req, res) {
   }
 }
 
-// 3. Berilgan vaqt oralig‘ida xizmatni BEKOR QILGAN clientlar ro‘yxati
-// ⚠️ Sizning enum qiymatlar: "pending", "in_progress", "done"
-// "cancelled" YO‘Q, shuning uchun "pending" deb taxmin qilyapman
+
 async function getClientsCancelledServices(req, res) {
   try {
     const { startDate, endDate } = req.query;
@@ -60,7 +56,7 @@ async function getClientsCancelledServices(req, res) {
         {
           model: TextContract,
           where: {
-            status: "pending", // yoki boshqa mos enum qiymat
+            status: "pending", 
             start_date: { [Op.gte]: new Date(startDate) },
             end_date: { [Op.lte]: new Date(endDate) },
           },
@@ -74,9 +70,7 @@ async function getClientsCancelledServices(req, res) {
   }
 }
 
-// 4. Berilgan xizmat nomi bo‘yicha eng ko‘p bajargan Translatorlar
-// ⚠️ TextContract ichida "first_language", "second_language" bor
-// Shu bo‘yicha filtrlash mumkin
+
 async function getTopOwnersByService(req, res) {
   try {
     const { firstLanguage, secondLanguage } = req.query;
@@ -103,7 +97,6 @@ async function getTopOwnersByService(req, res) {
   }
 }
 
-// 5. Berilgan Client asosida bajarilgan paymentlar (xizmat va owner bilan)
 async function getPaymentsByClient(req, res) {
   try {
     const { clientId } = req.params;
