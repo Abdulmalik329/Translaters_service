@@ -5,10 +5,16 @@ const sequelize = require("./config/db");
 const cookieParser = require("cookie-parser");
 const authRoutes = require("./routes/auth.routes");
 const errorHandler = require("./middlewares/errorHanding");
+const logger = require("./services/loger.servec");
 
 const PORT = config.get("port") ?? 3030;
 
 const app = express();
+
+logger.error("tract")
+logger.info("log ma'lumotlari"),
+logger.debug("debug ma'lumotlari")
+logger.warn("log ma'lumotlari")
 
 app.use(express.json());
 app.use(cookieParser());

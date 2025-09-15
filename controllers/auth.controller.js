@@ -3,14 +3,13 @@ const jwt = require("jsonwebtoken");
 const config = require("config");
 const Admin = require("../models/admin");
 const { Op } = require("sequelize");
-const sendVerificationEmail = require("../helper/sendEmail");  // Email yuborish funksiyasi
+const sendVerificationEmail = require("../helper/sendEmail");  
 
 const jwtSecret = config.get("jwtSecret");
 const jwtRefreshSecret = config.get("jwtRefreshSecret");
 const accessTokenExpiry = config.get("jwtAccessExpiration");
 const refreshTokenExpiry = config.get("jwtRefreshExpiration");
 
-// Access token yaratish
 const generateAccessToken = (admin) => {
   return jwt.sign(
     { id: admin.id, email: admin.email, name: admin.name },
@@ -19,7 +18,6 @@ const generateAccessToken = (admin) => {
   );
 };
 
-// Refresh token yaratish
 const generateRefreshToken = (admin) => {
   return jwt.sign(
     { id: admin.id },
