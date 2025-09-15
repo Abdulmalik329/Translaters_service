@@ -14,7 +14,6 @@ const adminLoginSchema = Joi.object({
 });
 
 
-// Admin validation
 const adminSchema = Joi.object({
   name: Joi.string().required(),
   phone: Joi.string().min(7).max(15).required(),
@@ -23,7 +22,6 @@ const adminSchema = Joi.object({
   is_creater: Joi.boolean().required(),
 });
 
-// Client validation
 const clientSchema = Joi.object({
   name: Joi.string().required(),
   phone: Joi.string().min(7).max(15).required(),
@@ -31,19 +29,19 @@ const clientSchema = Joi.object({
   service: Joi.string().required(),
 });
 
-// Language validation
 const languageSchema = Joi.object({
   name: Joi.string().required(),
   translater_id: Joi.number().integer().required(),
 });
 
-// Payment validation
 const paymentSchema = Joi.object({
-  amount: Joi.number().required(),
-  text_contract_id: Joi.number().integer().required(),
+  price: Joi.number().integer().min(0).required(),
+  servic: Joi.string().required(),
+  first_language: Joi.string().required(),
+  second_language: Joi.string().required(),
+  text_contract_id: Joi.number().integer().required()
 });
 
-// Text Contract validation
 const textContractSchema = Joi.object({
   client_id: Joi.number().integer().required(),
   admin_id: Joi.number().integer().required(),
@@ -58,7 +56,7 @@ const textContractSchema = Joi.object({
   payment: Joi.string().valid("paid", "unpaid").required(),
 });
 
-// Translater validation
+
 const translaterSchema = Joi.object({
   name: Joi.string().required(),
   languages_id: Joi.number().integer().required(),
@@ -67,7 +65,6 @@ const translaterSchema = Joi.object({
   experience: Joi.string().required(),
 });
 
-// Translater Contract validation
 const translaterContractSchema = Joi.object({
   translator_id: Joi.number().required(),
   client_id: Joi.number().required(),

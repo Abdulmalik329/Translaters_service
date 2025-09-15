@@ -4,6 +4,7 @@ const mainRouter = require("./routes/index");
 const sequelize = require("./config/db");
 const cookieParser = require("cookie-parser");
 const authRoutes = require("./routes/auth.routes");
+const errorHandler = require("./middlewares/errorHanding");
 
 const PORT = config.get("port") ?? 3030;
 
@@ -14,6 +15,7 @@ app.use(cookieParser());
 
 app.use("/api", mainRouter);
 app.use("/api/auth", authRoutes);
+app.use(errorHandler);
 
 const start = async () => {
   try {

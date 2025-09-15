@@ -68,29 +68,23 @@ const register = async (req, res) => {
   }
 };
 
-// Login
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Adminni topish
     const admin = await Admin.findOne({ where: { email } });
     if (!admin) return res.status(400).json({ message: "Noto'g'ri email yoki parol" });
 
-    // Email tasdiqlanganligini tekshirish
     if (!admin.is_verified) {
       return res.status(401).json({ message: "Email hali tasdiqlanmagan!" });
     }
 
-    // Parolni solishtirish
     const isValid = await bcrypt.compare(password, admin.password);
     if (!isValid) return res.status(400).json({ message: "Noto'g'ri email yoki parol" });
 
-    // Tokenlar yaratish
     const accessToken = generateAccessToken(admin);
     const refreshToken = generateRefreshToken(admin);
 
-    // Refresh tokenni cookie ga joylash
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -104,13 +98,11 @@ const login = async (req, res) => {
   }
 };
 
-// Logout
 const logout = (req, res) => {
   res.clearCookie("refreshToken");
   res.json({ message: "Logout muvaffaqiyatli bajarildi" });
 };
 
-// Refresh tokenni yangilash
 const refreshToken = (req, res) => {
   try {
     const token = req.cookies.refreshToken;
@@ -131,7 +123,6 @@ const refreshToken = (req, res) => {
   }
 };
 
-// Email tasdiqlash
 const verifyEmail = async (req, res) => {
   try {
     const { token } = req.query;
